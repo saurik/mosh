@@ -191,11 +191,11 @@ void NotificationEngine::apply( Framebuffer &fb ) const
   if ( message.empty() && (!time_expired) ) {
     return;
   } else if ( message.empty() && time_expired ) {
-    swprintf( tmp, 128, L"mosh: Last contact %.0f seconds ago. [To quit: Ctrl-^ .]", (double)(now - last_word_from_server) / 1000.0 );
+    swprintf( tmp, 128, L"mosh: Last contact %.0f seconds ago. [To quit: <enter> ~ .]", (double)(now - last_word_from_server) / 1000.0 );
   } else if ( (!message.empty()) && (!time_expired) ) {
-    swprintf( tmp, 128, L"mosh: %ls [To quit: Ctrl-^ .]", message.c_str() );
+    swprintf( tmp, 128, L"mosh: %ls [To quit: <enter> ~ .]", message.c_str() );
   } else {
-    swprintf( tmp, 128, L"mosh: %ls (%.0f s without contact.) [To quit: Ctrl-^ .]", message.c_str(),
+    swprintf( tmp, 128, L"mosh: %ls (%.0f s without contact.) [To quit: <enter> ~ .]", message.c_str(),
 	      (double)(now - last_word_from_server) / 1000.0 );
   }
 

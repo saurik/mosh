@@ -45,8 +45,11 @@ private:
   Terminal::Display display;
 
   std::wstring connecting_notification;
-  bool repaint_requested, quit_sequence_started;
+  bool repaint_requested;
   bool clean_shutdown;
+
+  int quit_sequence_state;
+  char quit_sequence_char;
 
   void main_init( void );
   bool process_network_input( void );
@@ -74,8 +77,9 @@ public:
       display( true ), /* use TERM environment var to initialize display */
       connecting_notification(),
       repaint_requested( false ),
-      quit_sequence_started( false ),
-      clean_shutdown( false )
+      clean_shutdown( false ),
+      quit_sequence_state( 0 ),
+      quit_sequence_char( '~' )
   {
     if ( predict_mode ) {
       if ( !strcmp( predict_mode, "always" ) ) {

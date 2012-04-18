@@ -228,8 +228,11 @@ bool STMClient::process_user_input( int fd )
 
       overlays.get_prediction_engine().new_user_byte( the_byte, *local_framebuffer );
 
-      if ( quit_sequence_started ) {
-	if ( the_byte == '.' ) { /* Quit sequence is Ctrl-^ . */
+      if ( quit_sequence_state == 2 ) {
+	quit_sequence_state = 0;
+
+	switch ( the_byte ) {
+	case '.':
 	  if ( network->has_remote_addr() && (!network->shutdown_in_progress()) ) {
 	    overlays.get_notification_engine().set_notification_string( wstring( L"Exiting on user request..." ), true );
 	    network->start_shutdown();
@@ -237,22 +240,29 @@ bool STMClient::process_user_input( int fd )
 	  } else {
 	    return false;
 	  }
-	} else if ( the_byte == '^' ) {
-	  /* Emulation sequence to type Ctrl-^ is Ctrl-^ ^ */
-	  network->get_current_state().push_back( Parser::UserByte( 0x1E ) );
-	} else {
-	  /* Ctrl-^ followed by anything other than . and ^ gets sent literally */
-	  network->get_current_state().push_back( Parser::UserByte( 0x1E ) );
-	  network->get_current_state().push_back( Parser::UserByte( the_byte ) );	  
-	}
+	  break;
 
-	quit_sequence_started = false;
-	continue;
+	default:
+	  if ( the_byte != quit_sequence_char ) {
+	    network->get_current_state().push_back( Parser::UserByte( '~' ) );
+	  }
+	  break;
+	}
       }
 
-      quit_sequence_started = (the_byte == 0x1E);
-      if ( quit_sequence_started ) {
-	continue;
+      if ( quit_sequence_state == 1 ) {
+	if ( the_byte == quit_sequence_char ) {
+	  quit_sequence_state = 2;
+	  continue;
+	} else {
+	  quit_sequence_state = 0;
+	}
+      }
+
+      if ( quit_sequence_state == 0 ) {
+	if ( the_byte == '\n' || the_byte == '\r' ) {
+	  quit_sequence_state = 1;
+	}
       }
 
       if ( the_byte == 0x0C ) { /* Ctrl-L */
