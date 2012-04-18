@@ -244,7 +244,7 @@ bool STMClient::process_user_input( int fd )
 
 	default:
 	  if ( the_byte != quit_sequence_char ) {
-	    network->get_current_state().push_back( Parser::UserByte( '~' ) );
+	    network->get_current_state().push_back( Parser::UserByte( quit_sequence_char ) );
 	  }
 	  break;
 	}
